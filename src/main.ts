@@ -13,9 +13,13 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // ✅ Serve uploaded images
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  await app.listen(5000, '0.0.0.0');
+  const port = process.env.PORT || 5000;
+
+  await app.listen(port, '0.0.0.0');
+
+  console.log(`🚀 GyaanBucks backend running on port ${port}`);
 }
+
 bootstrap();
