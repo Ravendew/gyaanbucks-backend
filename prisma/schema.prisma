@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum RedeemStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  mobile      String   @unique
+  countryCode String   @default("+91")
+  email       String?  @unique
+  password    String
+  role        UserRole @default(USER)
+
+  wallet Int @default(0)
+  upiId        String?
+googlePay    String?
+phonePe      String?
+bankHolder   String?
+bankName     String?
+accountNo    String?
+ifscCode     String?
+
+  isActive Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  redeemRequests RedeemRequest[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  icon        String   @default("📚")
+  description String   @default("")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Quiz {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  subtitle       String
+  category       String
+  reward         Int           @default(100)
+  timeLimit      Int           @default(300)
+  attemptsPerDay Int           @default(2)
+  isActive       Boolean       @default(true)
+  onlinePlayers  Int           @default(100)
+  questions      Question[]
+  attempts       QuizAttempt[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Question {
+  id              String   @id @default(cuid())
+  quizId          String
+  question        String
+  optionA         String
+  optionB         String
+  optionC         String
+  optionD         String
+  correctOptionId String
+  quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  quizSlug  String
+  deviceId  String
+  playDate  String
+  attempts  Int      @default(0)
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([quizSlug, deviceId, playDate])
+}
+
+model RedeemRequest {
+  id        String       @id @default(cuid())
+  userId    String
+  points    Int
+  amount    Float
+  status    RedeemStatus @default(PENDING)
+  adminNote String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model RedeemSetting {
+  id                String   @id @default(cuid())
+  minimumPoints     Int      @default(5000)
+  allowedDayOfMonth Int      @default(5)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  imageUrl    String?
+  category    String
+  tags        String?
+  metaTitle   String?
+  metaDesc    String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
