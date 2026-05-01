@@ -9,12 +9,15 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'http://localhost:5173',
       'http://localhost:3000',
+      'http://localhost:5173',
+      'https://gyaanbucks.com',
+      'https://www.gyaanbucks.com',
+      'https://admin.gyaanbucks.com',
       'https://gyaanbucks-frontend.vercel.app',
       'https://gyaanbucks-admin.vercel.app',
     ],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
 
