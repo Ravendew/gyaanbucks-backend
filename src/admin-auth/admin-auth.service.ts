@@ -8,7 +8,7 @@ type AdminLoginInput = {
 @Injectable()
 export class AdminAuthService {
   private readonly adminUsername = 'admin';
-  private readonly adminPassword = 'admin123';
+  private readonly adminPassword = 'Aryaadya@2';
 
   login(input: AdminLoginInput) {
     const username = input.username?.trim();
