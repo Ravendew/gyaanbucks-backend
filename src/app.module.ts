@@ -12,6 +12,7 @@ import { CategoryModule } from './category/category.module';
 import { RedeemSettingModule } from './redeem-setting/redeem-setting.module';
 import { BlogModule } from './blog/blog.module';
 import { UploadModule } from './upload/upload.module';
+import { AdminAuthModule } from './admin-auth/admin-auth.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UploadModule } from './upload/upload.module';
     RedeemSettingModule,
     BlogModule,
     UploadModule,
+    AdminAuthModule,
   ],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],

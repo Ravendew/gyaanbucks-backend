@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './create-category.dto';
 
@@ -14,6 +16,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from './create-category.dto';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  @UseGuards(AdminAuthGuard)
   @Post()
   create(@Body() dto: CreateCategoryDto) {
     return this.categoryService.create(dto);
@@ -29,11 +32,13 @@ export class CategoryController {
     return this.categoryService.findActive();
   }
 
+  @UseGuards(AdminAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
     return this.categoryService.update(id, dto);
   }
 
+  @UseGuards(AdminAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
