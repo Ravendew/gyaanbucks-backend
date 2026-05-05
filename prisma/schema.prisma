@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -27,16 +27,16 @@ model User {
   password    String
   role        UserRole @default(USER)
 
-  wallet Int @default(0)
-  upiId        String?
-googlePay    String?
-phonePe      String?
-bankHolder   String?
-bankName     String?
-accountNo    String?
-ifscCode     String?
+  wallet     Int     @default(0)
+  upiId      String?
+  googlePay  String?
+  phonePe    String?
+  bankHolder String?
+  bankName   String?
+  accountNo  String?
+  ifscCode   String?
 
-  isActive Boolean  @default(true)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -64,10 +64,12 @@ model Quiz {
   attemptsPerDay Int           @default(2)
   isActive       Boolean       @default(true)
   onlinePlayers  Int           @default(100)
-  questions      Question[]
-  attempts       QuizAttempt[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+
+  questions Question[]
+  attempts  QuizAttempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Question {
@@ -79,19 +81,23 @@ model Question {
   optionC         String
   optionD         String
   correctOptionId String
-  quiz            Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model QuizAttempt {
-  id        String   @id @default(cuid())
-  quizId    String
-  quizSlug  String
-  deviceId  String
-  playDate  String
-  attempts  Int      @default(0)
-  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  quizId   String
+  quizSlug String
+  deviceId String
+  playDate String
+  attempts Int    @default(0)
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -105,10 +111,11 @@ model RedeemRequest {
   amount    Float
   status    RedeemStatus @default(PENDING)
   adminNote String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RedeemSetting {
@@ -131,6 +138,7 @@ model Blog {
   metaTitle   String?
   metaDesc    String?
   isPublished Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
