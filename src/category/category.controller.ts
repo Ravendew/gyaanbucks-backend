@@ -10,7 +10,11 @@ import {
 } from '@nestjs/common';
 import { AdminAuthGuard } from '../common/guards/admin-auth.guard';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './create-category.dto';
+import {
+  CreateCategoryDto,
+  ReorderCategoryDto,
+  UpdateCategoryDto,
+} from './create-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -30,6 +34,12 @@ export class CategoryController {
   @Get('active')
   findActive() {
     return this.categoryService.findActive();
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Post('reorder')
+  reorder(@Body() dto: ReorderCategoryDto) {
+    return this.categoryService.reorder(dto);
   }
 
   @UseGuards(AdminAuthGuard)

@@ -1,17 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateCategoryDto, UpdateCategoryDto } from './create-category.dto';
+import {
+  CreateCategoryDto,
+  ReorderCategoryDto,
+  UpdateCategoryDto,
+} from './create-category.dto';
 
 @Injectable()
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateCategoryDto) {
+  async create(dto: CreateCategoryDto) {
+    const lastCategory = await this.prisma.category.findFirst({
+      orderBy: [{ position: 'desc' }, { createdAt: 'desc' }],
+    });
+
     return this.prisma.category.create({
       data: {
         name: dto.name.trim(),
         icon: dto.icon?.trim() || '📚',
         description: dto.description?.trim() || '',
+        position: dto.position ?? (lastCategory?.position ?? 0) + 1,
         isActive: dto.isActive ?? true,
       },
     });
@@ -19,9 +32,7 @@ export class CategoryService {
 
   findAll() {
     return this.prisma.category.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -30,9 +41,7 @@ export class CategoryService {
       where: {
         isActive: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ position: 'asc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -53,9 +62,33 @@ export class CategoryService {
         ...(dto.description !== undefined
           ? { description: dto.description.trim() }
           : {}),
+        ...(dto.position !== undefined
+          ? { position: Number(dto.position) }
+          : {}),
         ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
       },
     });
+  }
+
+  async reorder(dto: ReorderCategoryDto) {
+    if (!dto.items || !Array.isArray(dto.items) || dto.items.length === 0) {
+      throw new BadRequestException('Items are required');
+    }
+
+    return this.prisma.$transaction(
+      dto.items.map((item, index) =>
+        this.prisma.category.update({
+          where: { id: item.id },
+          data: {
+            position:
+              Number.isFinite(Number(item.position)) &&
+              Number(item.position) > 0
+                ? Number(item.position)
+                : index + 1,
+          },
+        }),
+      ),
+    );
   }
 
   async remove(id: string) {
